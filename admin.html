@@ -1,0 +1,582 @@
+```html
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Administration - Ma Ludothèque
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="admin.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <div class="header-content">
+
+
+        <a
+            href="index.html"
+            class="logo"
+        >
+
+            <span class="logo-icon">
+                🎲
+            </span>
+
+            <div>
+
+                <h1>
+                    Ma Ludothèque
+                </h1>
+
+                <p>
+                    Administration
+                </p>
+
+            </div>
+
+        </a>
+
+
+        <a
+            href="index.html"
+            class="back-button"
+        >
+            ← Retour à la ludothèque
+        </a>
+
+
+    </div>
+
+</header>
+
+
+
+<main class="container">
+
+
+<!-- =========================
+     TITRE
+========================== -->
+
+<section class="page-title">
+
+    <div>
+
+        <h2>
+            Administration
+        </h2>
+
+        <p>
+            Gère les jeux présents dans ta collection.
+        </p>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+     FORMULAIRE
+========================== -->
+
+<section class="admin-card">
+
+
+    <div class="card-header">
+
+        <div>
+
+            <h3 id="formTitle">
+                Ajouter un jeu
+            </h3>
+
+            <p>
+                Ajoute un nouveau jeu à ta ludothèque.
+            </p>
+
+        </div>
+
+        <span class="add-icon">
+            ＋
+        </span>
+
+    </div>
+
+
+
+    <form id="gameForm">
+
+
+        <!-- NOM -->
+
+        <div class="form-group">
+
+            <label for="gameName">
+                Nom du jeu
+            </label>
+
+            <input
+                type="text"
+                id="gameName"
+                placeholder="Ex : Monopoly Disney"
+                required
+            >
+
+        </div>
+
+
+
+        <!-- FRANCHISE -->
+
+        <div class="form-group">
+
+            <label for="gameFranchise">
+                Franchise
+            </label>
+
+            <input
+                type="text"
+                id="gameFranchise"
+                placeholder="Ex : Monopoly"
+            >
+
+            <small>
+                Laisse vide si le jeu n'appartient pas à une franchise.
+            </small>
+
+        </div>
+
+
+
+        <!-- POSITION -->
+
+        <div class="form-group">
+
+            <label for="gameOrder">
+                Position dans la collection
+            </label>
+
+            <input
+                type="number"
+                id="gameOrder"
+                min="1"
+                step="1"
+                placeholder="Ex : 1"
+            >
+
+            <small>
+                Indique la position du jeu dans ta collection.
+                Les autres jeux seront automatiquement décalés.
+            </small>
+
+        </div>
+
+
+
+        <!-- JOUEURS -->
+
+        <div class="form-row">
+
+
+            <div class="form-group">
+
+                <label for="minPlayers">
+
+                    Joueurs minimum
+
+                    <span class="optional">
+                        (facultatif)
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="number"
+                    id="minPlayers"
+                    min="1"
+                    placeholder="Ex : 2"
+                >
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label for="maxPlayers">
+
+                    Joueurs maximum
+
+                    <span class="optional">
+                        (facultatif)
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="number"
+                    id="maxPlayers"
+                    min="1"
+                    placeholder="Ex : 6"
+                >
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- DUREE -->
+
+        <div class="form-row">
+
+
+            <div class="form-group">
+
+                <label for="minDuration">
+
+                    Durée minimum
+
+                    <span class="optional">
+                        (facultatif)
+                    </span>
+
+                </label>
+
+
+                <div class="input-with-unit">
+
+
+                    <input
+                        type="number"
+                        id="minDuration"
+                        min="1"
+                        placeholder="Ex : 30"
+                    >
+
+
+                    <span>
+                        min
+                    </span>
+
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label for="maxDuration">
+
+                    Durée maximum
+
+                    <span class="optional">
+                        (facultatif)
+                    </span>
+
+                </label>
+
+
+                <div class="input-with-unit">
+
+
+                    <input
+                        type="number"
+                        id="maxDuration"
+                        min="1"
+                        placeholder="Ex : 60"
+                    >
+
+
+                    <span>
+                        min
+                    </span>
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- AGE -->
+
+        <div class="form-group">
+
+            <label for="minAge">
+
+                Âge minimum
+
+                <span class="optional">
+                    (facultatif)
+                </span>
+
+            </label>
+
+
+            <div class="input-with-unit age-input">
+
+
+                <input
+                    type="number"
+                    id="minAge"
+                    min="0"
+                    placeholder="Ex : 8"
+                >
+
+
+                <span>
+                    ans
+                </span>
+
+
+            </div>
+
+        </div>
+
+        <div class="form-group" id="orderGroup" style="display: none;">
+
+    <label for="gameOrder">
+        Position
+    </label>
+
+    <input
+        type="number"
+        id="gameOrder"
+        min="1"
+        placeholder="Ex : 2"
+    >
+
+    <small>
+        Disponible uniquement lors de la modification d'un jeu.
+    </small>
+
+</div>
+
+
+        <!-- IMAGE -->
+
+        <div class="form-group">
+
+            <label for="gameImage">
+
+                Image du jeu
+
+                <span class="optional">
+                    (facultatif)
+                </span>
+
+            </label>
+
+
+            <input
+                type="file"
+                id="gameImage"
+                accept="image/*"
+            >
+
+
+            <div
+                id="imagePreview"
+                class="image-preview"
+            >
+
+                <span>
+                    🖼️
+                </span>
+
+                <p>
+                    Aucune image sélectionnée
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DESCRIPTION -->
+
+        <div class="form-group">
+
+            <label for="gameDescription">
+
+                Description
+
+                <span class="optional">
+                    (facultatif)
+                </span>
+
+            </label>
+
+
+            <textarea
+                id="gameDescription"
+                rows="4"
+                placeholder="Une courte description du jeu..."
+            ></textarea>
+
+        </div>
+
+
+
+        <!-- BOUTONS -->
+
+        <div class="form-actions">
+
+
+            <button
+                type="button"
+                id="cancelEdit"
+                class="cancel-button"
+            >
+                Annuler
+            </button>
+
+
+            <button
+                type="submit"
+                class="save-button"
+            >
+
+                <span>
+                    ＋
+                </span>
+
+                Ajouter le jeu
+
+            </button>
+
+
+        </div>
+
+
+    </form>
+
+</section>
+
+
+
+<!-- =========================
+     LISTE DES JEUX
+========================== -->
+
+<section class="games-section">
+
+
+    <div class="section-header">
+
+
+        <div>
+
+            <h3>
+                Mes jeux
+            </h3>
+
+            <p>
+
+                <strong id="adminGameCount">
+                    0
+                </strong>
+
+                jeux enregistrés
+
+            </p>
+
+        </div>
+
+
+
+        <div class="admin-search">
+
+            <span>
+                ⌕
+            </span>
+
+
+            <input
+                type="search"
+                id="adminSearch"
+                placeholder="Rechercher..."
+            >
+
+        </div>
+
+
+    </div>
+
+
+
+    <div
+        id="adminGamesList"
+        class="admin-games-list"
+    ></div>
+
+
+
+    <div
+        id="emptyGames"
+        class="empty-games"
+    >
+
+        <div>
+            🎲
+        </div>
+
+        <h3>
+            Aucun jeu
+        </h3>
+
+        <p>
+            Ajoute ton premier jeu avec le formulaire ci-dessus.
+        </p>
+
+    </div>
+
+
+</section>
+
+
+
+</main>
+
+
+
+<script
+    type="module"
+    src="admin.js"
+></script>
+
+
+</body>
+
+</html>
+```

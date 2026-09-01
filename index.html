@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Ma Ludothèque</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <div class="header-content">
+
+        <a
+            href="index.html"
+            class="logo"
+        >
+
+            <span class="logo-icon">
+                🎲
+            </span>
+
+            <div>
+
+                <h1>
+                    Ma Ludothèque
+                </h1>
+
+                <p>
+                    Ma collection personnelle
+                </p>
+
+            </div>
+
+        </a>
+
+
+        <a
+            href="random.html"
+            class="random-button"
+        >
+
+            🎲
+
+            <span>
+                Jeu aléatoire
+            </span>
+
+        </a>
+
+    </div>
+
+</header>
+
+
+
+<main class="container">
+
+
+    <!-- =========================
+         TITRE
+    ========================== -->
+
+    <div class="top-section">
+
+        <div>
+
+            <h2>
+                Mes jeux
+            </h2>
+
+            <p>
+
+                <span id="gameCount">
+                    0
+                </span>
+
+                jeux dans ma collection
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         RECHERCHE + FILTRE
+    ========================== -->
+
+    <div class="search-area">
+
+
+        <div class="search-container">
+
+
+            <span class="search-icon">
+                ⌕
+            </span>
+
+
+            <input
+                type="search"
+                id="searchInput"
+                placeholder="Rechercher un jeu..."
+                autocomplete="off"
+            >
+
+
+            <button
+                id="clearSearch"
+                type="button"
+                aria-label="Effacer la recherche"
+            >
+                ×
+            </button>
+
+
+            <button
+                id="favoritesFilter"
+                class="favorites-filter"
+                type="button"
+                aria-label="Afficher uniquement les favoris"
+                title="Afficher uniquement les favoris"
+            >
+                ♡
+            </button>
+
+
+        </div>
+
+
+
+        <div class="license-filter">
+
+            <select id="licenseFilter">
+
+                <option value="">
+                    Toutes les licences
+                </option>
+
+            </select>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =========================
+         FILTRES ACTIFS
+    ========================== -->
+
+    <div
+        id="activeFilters"
+        class="active-filters"
+    ></div>
+
+
+
+    <!-- =========================
+         JEUX
+    ========================== -->
+
+    <div
+        id="gamesContainer"
+        class="games-grid"
+    ></div>
+
+
+
+    <!-- =========================
+         CHARGEMENT
+    ========================== -->
+
+    <div
+        id="loadingGames"
+        class="no-results visible"
+    >
+
+        <div>
+            🎲
+        </div>
+
+        <h3>
+            Chargement...
+        </h3>
+
+        <p>
+            Récupération de ta ludothèque.
+        </p>
+
+    </div>
+
+
+
+    <!-- =========================
+         AUCUN RESULTAT
+    ========================== -->
+
+    <div
+        id="noResults"
+        class="no-results"
+    >
+
+        <div>
+            🎲
+        </div>
+
+        <h3>
+            Aucun jeu trouvé
+        </h3>
+
+        <p>
+            Aucun jeu ne correspond à ta recherche.
+        </p>
+
+    </div>
+
+
+</main>
+
+
+
+<footer class="footer">
+
+    🎲 Ma Ludothèque
+
+</footer>
+
+
+
+<script type="module">
+
+
+import { initializeApp }
+
+from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+
+import {
+
+    getFirestore,
+    collection,
+    getDocs
+
+}
+
+from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+
+
+// ==========================================
+// FIREBASE
+// ==========================================
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyBSJq_1VgjhmDfKSCwcWBzqVieTDo3JQuo",
+
+    authDomain:
+        "jeux-societe-d11a9.firebaseapp.com",
+
+    projectId:
+        "jeux-societe-d11a9",
+
+    storageBucket:
+        "jeux-societe-d11a9.firebasestorage.app",
+
+    messagingSenderId:
+        "1093940990306",
+
+    appId:
+        "1:1093940990306:web:03860c21ca310642fa5c3b",
+
+    measurementId:
+        "G-MHG7JCGX1V"
+
+};
+
+
+const app =
+    initializeApp(firebaseConfig);
+
+
+const db =
+    getFirestore(app);
+
+
+
+// ==========================================
+// ELEMENTS
+// ==========================================
+
+const gamesContainer =
+    document.getElementById(
+        "gamesContainer"
+    );
+
+
+const gameCount =
+    document.getElementById(
+        "gameCount"
+    );
+
+
+const searchInput =
+    document.getElementById(
+        "searchInput"
+    );
+
+
+const clearSearch =
+    document.getElementById(
+        "clearSearch"
+    );
+
+
+const favoritesFilter =
+    document.getElementById(
+        "favoritesFilter"
+    );
+
+
+const licenseFilter =
+    document.getElementById(
+        "licenseFilter"
+    );
+
+
+const activeFilters =
+    document.getElementById(
+        "activeFilters"
+    );
+
+
+const noResults =
+    document.getElementById(
+        "noResults"
+    );
+
+
+const loadingGames =
+    document.getElementById(
+        "loadingGames"
+    );
+
+
+
+// ==========================================
+// VARIABLES
+// ==========================================
+
+let games = [];
+
+let favoritesOnly = false;
+
+
+
+// ==========================================
+// FAVORIS
+// ==========================================
+
+let favorites = [];
+
+
+try {
+
+    favorites =
+        JSON.parse(
+            localStorage.getItem(
+                "maLudothequeFavorites"
+            ) || "[]"
+        );
+
+    if (!Array.isArray(favorites)) {
+
+        favorites = [];
+
+    }
+
+} catch {
+
+    favorites = [];
+
+}
+
+
+
+function isFavorite(id) {
+
+    return favorites.includes(id);
+
+}
+
+
+
+function toggleFavorite(id) {
+
+
+    if (isFavorite(id)) {
+
+        favorites =
+            favorites.filter(
+                favoriteId =>
+                    favoriteId !== id
+            );
+
+    } else {
+
+        favorites.push(id);
+
+    }
+
+
+    localStorage.setItem(
+
+        "maLudothequeFavorites",
+
+        JSON.stringify(
+            favorites
+        )
+
+    );
+
+
+    renderGames();
+
+}
+
+
+
+// ==========================================
+// ORDRE GENERAL
+// ==========================================
+
+function compareGameOrder(a, b) {
+
+
+    const orderA =
+        Number(a.order);
+
+
+    const orderB =
+        Number(b.order);
+
+
+    const validA =
+        Number.isFinite(orderA);
+
+
+    const validB =
+        Number.isFinite(orderB);
+
+
+
+    /*
+     * Les jeux possédant une position
+     * passent avant ceux qui n'en ont pas.
+     */
+
+    if (!validA && !validB) {
+
+        return (
+            (a.name || "")
+                .localeCompare(
+                    b.name || "",
+                    "fr",
+                    {
+                        sensitivity: "base"
+                    }
+                )
+        );
+
+    }
+
+
+    if (!validA) {
+
+        return 1;
+
+    }
+
+
+    if (!validB) {
+
+        return -1;
+
+    }
+
+
+    if (orderA !== orderB) {
+
+        return orderA - orderB;
+
+    }
+
+
+    return (
+        (a.name || "")
+            .localeCompare(
+                b.name || "",
+                "fr",
+                {
+                    sensitivity: "base"
+                }
+            )
+    );
+
+}
+
+
+
+// ==========================================
+// CHARGER LES JEUX
+// ==========================================
+
+async function loadGames() {
+
+
+    try {
+
+
+        const snapshot =
+            await getDocs(
+                collection(
+                    db,
+                    "games"
+                )
+            );
+
+
+        games = [];
+
+
+        snapshot.forEach(document => {
+
+
+            games.push({
+
+                id:
+                    document.id,
+
+                ...document.data()
+
+            });
+
+
+        });
+
+
+
+        /*
+         * L'ordre général est défini
+         * par le champ "order".
+         */
+
+        games.sort(
+            compareGameOrder
+        );
+
+
+
+        loadingGames
+            .classList
+            .remove(
+                "visible"
+            );
+
+
+
+        createLicenseFilter();
+
+        renderGames();
+
+
+
+    } catch (error) {
+
+
+        console.error(
+            "Erreur Firebase :",
+            error
+        );
+
+
+        loadingGames
+            .classList
+            .remove(
+                "visible"
+            );
+
+
+        gamesContainer.innerHTML = `
+
+            <div class="no-results visible">
+
+                <div>
+                    ⚠️
+                </div>
+
+                <h3>
+                    Impossible de charger les jeux
+                </h3>
+
+                <p>
+                    ${escapeHTML(
+                        error.message
+                    )}
+                </p>
+
+            </div>
+
+        `;
+
+
+    }
+
+}
+
+
+
+// ==========================================
+// FILTRE LICENCES
+// ==========================================
+
+function createLicenseFilter() {
+
+
+    const currentValue =
+        licenseFilter.value;
+
+
+    const licenses = [
+
+        ...new Set(
+
+            games
+
+                .map(
+                    game =>
+                        game.franchise?.trim()
+                )
+
+                .filter(Boolean)
+
+        )
+
+    ];
+
+
+    licenses.sort(
+        (a, b) =>
+            a.localeCompare(
+                b,
+                "fr",
+                {
+                    sensitivity: "base"
+                }
+            )
+    );
+
+
+
+    licenseFilter.innerHTML = `
+
+        <option value="">
+            Toutes les licences
+        </option>
+
+    `;
+
+
+
+    licenses.forEach(license => {
+
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            license;
+
+
+        option.textContent =
+            license;
+
+
+        licenseFilter.appendChild(
+            option
+        );
+
+
+    });
+
+
+
+    if (
+        licenses.includes(
+            currentValue
+        )
+    ) {
+
+        licenseFilter.value =
+            currentValue;
+
+    }
+
+}
+
+
+
+// ==========================================
+// AFFICHER LES JEUX
+// ==========================================
+
+function renderGames() {
+
+
+    const search =
+        searchInput.value
+            .toLowerCase()
+            .trim();
+
+
+    const selectedLicense =
+        licenseFilter.value;
+
+
+
+    const filteredGames =
+
+        games.filter(game => {
+
+
+            const name =
+                (game.name || "")
+                    .toLowerCase();
+
+
+            const franchise =
+                (game.franchise || "")
+                    .toLowerCase();
+
+
+
+            const matchesSearch =
+
+                !search ||
+
+                name.includes(
+                    search
+                ) ||
+
+                franchise.includes(
+                    search
+                );
+
+
+
+            const matchesLicense =
+
+                !selectedLicense ||
+
+                game.franchise ===
+                    selectedLicense;
+
+
+
+            const matchesFavorites =
+
+                !favoritesOnly ||
+
+                isFavorite(
+                    game.id
+                );
+
+
+
+            return (
+
+                matchesSearch &&
+
+                matchesLicense &&
+
+                matchesFavorites
+
+            );
+
+        });
+
+
+
+    /*
+     * On conserve TOUJOURS
+     * l'ordre général.
+     */
+
+    filteredGames.sort(
+        compareGameOrder
+    );
+
+
+
+    gamesContainer.innerHTML = "";
+
+
+
+    gameCount.textContent =
+        filteredGames.length;
+
+
+
+    if (
+        filteredGames.length === 0
+    ) {
+
+        noResults
+            .classList
+            .add(
+                "visible"
+            );
+
+    } else {
+
+        noResults
+            .classList
+            .remove(
+                "visible"
+            );
+
+    }
+
+
+
+    filteredGames.forEach(game => {
+
+
+        gamesContainer.appendChild(
+
+            createGameCard(
+                game
+            )
+
+        );
+
+
+    });
+
+
+
+    updateActiveFilters();
+
+}
+
+
+
+// ==========================================
+// CARTE
+// ==========================================
+
+function createGameCard(game) {
+
+
+    const article =
+        document.createElement(
+            "article"
+        );
+
+
+    article.className =
+        "game-card";
+
+
+
+    const favorite =
+        isFavorite(
+            game.id
+        );
+
+
+
+        
+    // ==================================
+    // IMAGE
+    // ==================================
+
+    let imageHTML;
+
+
+    if (game.image) {
+
+
+        imageHTML = `
+
+            <img
+                src="${escapeHTML(
+                    game.image
+                )}"
+                alt="${escapeHTML(
+                    game.name
+                )}"
+                loading="lazy"
+            >
+
+        `;
+
+
+    } else {
+
+
+        imageHTML = `
+
+            <span class="no-image">
+                🎲
+            </span>
+
+        `;
+
+
+    }
+
+
+
+    // ==================================
+    // DETAILS
+    // ==================================
+
+    const details = [];
+
+
+
+    const players =
+        formatPlayers(
+            game
+        );
+
+
+    const duration =
+        formatDuration(
+            game
+        );
+
+
+
+    if (players) {
+
+        details.push(
+            `👥 ${players}`
+        );
+
+    }
+
+
+
+    if (duration) {
+
+        details.push(
+            `⏱ ${duration}`
+        );
+
+    }
+
+
+
+    if (
+        game.minAge !== null &&
+        game.minAge !== undefined
+    ) {
+
+        details.push(
+            `🔞 ${game.minAge}+`
+        );
+
+    }
+
+
+
+    // ==================================
+    // HTML CARTE
+    // ==================================
+
+    article.innerHTML = `
+
+        <div class="game-image">
+
+            ${imageHTML}
+
+
+            <button
+                class="favorite-button ${
+                    favorite
+                    ? "is-favorite"
+                    : ""
+                }"
+                type="button"
+                aria-label="${
+                    favorite
+                    ? "Retirer des favoris"
+                    : "Ajouter aux favoris"
+                }"
+                title="${
+                    favorite
+                    ? "Retirer des favoris"
+                    : "Ajouter aux favoris"
+                }"
+            >
+
+                ${
+                    favorite
+                    ? "♥"
+                    : "♡"
+                }
+
+            </button>
+
+        </div>
+
+
+
+        <div class="game-info">
+
+            <h3>
+                ${escapeHTML(
+                    game.name
+                )}
+            </h3>
+
+
+            ${
+                game.franchise
+
+                ? `
+
+                    <div class="game-franchise">
+
+                        ${escapeHTML(
+                            game.franchise
+                        )}
+
+                    </div>
+
+                `
+
+                : ""
+            }
+
+
+            ${
+                details.length
+
+                ? `
+
+                    <div class="details">
+
+                        ${details
+                            .map(
+                                detail =>
+                                    `<span>${detail}</span>`
+                            )
+                            .join("")
+                        }
+
+                    </div>
+
+                `
+
+                : ""
+            }
+
+        </div>
+
+    `;
+
+
+
+    const favoriteButton =
+        article.querySelector(
+            ".favorite-button"
+        );
+
+
+
+    favoriteButton.addEventListener(
+        "click",
+        event => {
+
+
+            event.stopPropagation();
+
+
+            toggleFavorite(
+                game.id
+            );
+
+
+        }
+    );
+
+
+
+    return article;
+
+}
+
+
+
+// ==========================================
+// JOUEURS
+// ==========================================
+
+function formatPlayers(game) {
+
+
+    const min =
+        game.minPlayers;
+
+
+    const max =
+        game.maxPlayers;
+
+
+
+    if (
+        min != null &&
+        max != null
+    ) {
+
+
+        if (min === max) {
+
+            return `${min} joueur${
+                min > 1
+                ? "s"
+                : ""
+            }`;
+
+        }
+
+
+        return `${min}–${max}`;
+
+    }
+
+
+
+    if (min != null) {
+
+        return `${min}+`;
+
+    }
+
+
+
+    if (max != null) {
+
+        return `jusqu'à ${max}`;
+
+    }
+
+
+
+    return "";
+
+}
+
+
+
+// ==========================================
+// DUREE
+// ==========================================
+
+function formatDuration(game) {
+
+
+    const min =
+        game.minDuration;
+
+
+    const max =
+        game.maxDuration;
+
+
+
+    if (
+        min != null &&
+        max != null
+    ) {
+
+
+        if (min === max) {
+
+            return `${min} min`;
+
+        }
+
+
+        return `${min}–${max} min`;
+
+    }
+
+
+
+    if (min != null) {
+
+        return `${min}+ min`;
+
+    }
+
+
+
+    if (max != null) {
+
+        return `jusqu'à ${max} min`;
+
+    }
+
+
+
+    return "";
+
+}
+
+
+
+// ==========================================
+// FILTRES ACTIFS
+// ==========================================
+
+function updateActiveFilters() {
+
+
+    activeFilters.innerHTML = "";
+
+
+
+    if (
+        searchInput.value.trim()
+    ) {
+
+
+        const tag =
+            document.createElement(
+                "span"
+            );
+
+
+        tag.className =
+            "filter-tag";
+
+
+        tag.innerHTML = `
+
+            Recherche :
+
+            <strong>
+                ${escapeHTML(
+                    searchInput.value.trim()
+                )}
+            </strong>
+
+        `;
+
+
+        activeFilters.appendChild(
+            tag
+        );
+
+    }
+
+
+
+    if (
+        licenseFilter.value
+    ) {
+
+
+        const tag =
+            document.createElement(
+                "span"
+            );
+
+
+        tag.className =
+            "filter-tag";
+
+
+        tag.innerHTML = `
+
+            Licence :
+
+            <strong>
+                ${escapeHTML(
+                    licenseFilter.value
+                )}
+            </strong>
+
+        `;
+
+
+        activeFilters.appendChild(
+            tag
+        );
+
+    }
+
+
+
+    if (favoritesOnly) {
+
+
+        const tag =
+            document.createElement(
+                "span"
+            );
+
+
+        tag.className =
+            "filter-tag";
+
+
+        tag.innerHTML = `
+
+            <strong>
+                ♥ Favoris
+            </strong>
+
+        `;
+
+
+        activeFilters.appendChild(
+            tag
+        );
+
+    }
+
+}
+
+
+
+// ==========================================
+// RECHERCHE
+// ==========================================
+
+searchInput.addEventListener(
+    "input",
+    renderGames
+);
+
+
+
+// ==========================================
+// FILTRE LICENCE
+// ==========================================
+
+licenseFilter.addEventListener(
+    "change",
+    renderGames
+);
+
+
+
+// ==========================================
+// FILTRE FAVORIS
+// ==========================================
+
+favoritesFilter.addEventListener(
+    "click",
+    () => {
+
+
+        favoritesOnly =
+            !favoritesOnly;
+
+
+        favoritesFilter.classList.toggle(
+            "active",
+            favoritesOnly
+        );
+
+
+        favoritesFilter.textContent =
+            favoritesOnly
+            ? "♥"
+            : "♡";
+
+
+        renderGames();
+
+    }
+);
+
+
+
+// ==========================================
+// EFFACER RECHERCHE
+// ==========================================
+
+clearSearch.addEventListener(
+    "click",
+    () => {
+
+
+        searchInput.value = "";
+
+
+        renderGames();
+
+
+        searchInput.focus();
+
+    }
+);
+
+
+
+// ==========================================
+// ESCAPE HTML
+// ==========================================
+
+function escapeHTML(value) {
+
+
+    return String(value)
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+
+// ==========================================
+// DEMARRAGE
+// ==========================================
+
+loadGames();
+
+</script>
+
+
+</body>
+
+</html>
+```
